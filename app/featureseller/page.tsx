@@ -1,6 +1,8 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { ref, onValue, set, off } from "firebase/database";
+import { ref, onValue, set, off, DataSnapshot } from "firebase/database";
 import { db } from "../../firebase";
+import Image from "next/image";
 
 /**
  * Automatically finds the "top" user (by total likes+comments+purchases+shares+saves)
@@ -12,6 +14,25 @@ import { db } from "../../firebase";
  * - Assigns the owner with the highest total as /featuredSeller in DB
  * - Displays that user (name, avatar, total engagement)
  */
+type UserData = {
+  displayName?: string;
+  photoURL?: string;
+  email?: string;
+};
+
+type MessageStats = {
+  likes?: number;
+  comments?: number;
+  purchases?: number;
+  shares?: number;
+  saves?: number;
+};
+
+type MessageData = {
+  owner: string;
+  stats: MessageStats;
+};
+
 export const FeaturedSeller = () => {
   const [seller, setSeller] = useState<{
     displayName: string;
@@ -34,7 +55,7 @@ export const FeaturedSeller = () => {
     const usersRef = ref(db, "users");
     const messagesRef = ref(db, "messages");
 
-    let usersData: Record<string, any> = {};
+    let usersData: Record<string, UserData> = {};
     let statsByUser: Record<
       string,
       { likes: number; comments: number; purchases: number; shares: number; saves: number }
@@ -81,7 +102,7 @@ export const FeaturedSeller = () => {
     }
 
     // Listen for users
-    onValue(usersRef, (snap) => {
+    onValue(usersRef, (snap: DataSnapshot) => {
       usersData = snap.val() || {};
       // Only compute if we have loaded both
       if (Object.keys(statsByUser).length > 0) computeAndSetFeatured();
@@ -89,10 +110,10 @@ export const FeaturedSeller = () => {
     usersOff = () => off(usersRef, "value");
 
     // Listen for messages
-    onValue(messagesRef, (snap) => {
+    onValue(messagesRef, (snap: DataSnapshot) => {
       statsByUser = {};
-      const messages = snap.val() || {};
-      Object.values(messages).forEach((msg: any) => {
+      const messages: Record<string, MessageData> = snap.val() || {};
+      Object.values(messages).forEach((msg) => {
         if (!msg.owner || !msg.stats) return;
         if (!statsByUser[msg.owner]) {
           statsByUser[msg.owner] = {
@@ -141,10 +162,13 @@ export const FeaturedSeller = () => {
 
   return (
     <div className="flex items-center gap-3 mt-2">
-      <img
+      <Image
         src={seller.photoURL}
         alt={seller.displayName}
+        width={48}
+        height={48}
         className="w-12 h-12 rounded-full border-2 border-pink-400 shadow"
+        unoptimized={!!seller.photoURL && seller.photoURL.startsWith("http") && !seller.photoURL.startsWith("/")}
       />
       <span>
         <span className="block font-semibold">{seller.displayName}</span>

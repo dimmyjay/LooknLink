@@ -9,15 +9,11 @@ import {
   FaBookmark,
   FaShoppingCart,
   FaCommentDots,
-  FaHome,
+  
   FaUserPlus,
-  FaComments,
-  FaBell,
-  FaVideo,
-  FaMoon,
-  FaSun,
+  
   FaCheck,
-  FaRegCopy,
+  
   FaGithub,
   FaTwitter,
   FaInstagram,
@@ -25,7 +21,7 @@ import {
   FaLinkedin,
   FaEnvelope,
   FaSignOutAlt,
-  FaSignInAlt,
+  
   FaGoogle,
   FaWhatsapp,
   FaTiktok,

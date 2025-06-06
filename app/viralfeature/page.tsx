@@ -1,7 +1,9 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { ref, onValue, off } from "firebase/database";
+import { ref, onValue, off, DataSnapshot } from "firebase/database";
 import { db } from "../../firebase";
 import { FaCrown, FaGift } from "react-icons/fa";
+import Image from "next/image";
 
 /**
  * Leaderboard of Top Selling Videos (by sales count).
@@ -17,15 +19,20 @@ export const Leaderboard = () => {
 
   useEffect(() => {
     const messagesRef = ref(db, "messages");
-    const handleValue = (snap: any) => {
-      const data = snap.val();
+    const handleValue = (snap: DataSnapshot) => {
+      const data = snap.val() as Record<string, {
+        url?: string;
+        owner?: string;
+        stats?: { purchases?: number };
+        previewImg?: string;
+      }> | null;
       if (!data) {
         setLeaders([]);
         return;
       }
       // For each video, get sales (purchases)
       const arr = Object.entries(data)
-        .map(([id, value]: [string, any]) => ({
+        .map(([id, value]) => ({
           id,
           url: value.url || "",
           owner: value.owner || "",
@@ -51,7 +58,7 @@ export const Leaderboard = () => {
           <li key={v.id} className="flex items-center gap-3">
             <span className="text-xl font-bold">{i + 1}.</span>
             {v.previewImg ? (
-              <img src={v.previewImg} alt="Video preview" className="w-12 h-12 rounded-xl border-2 border-pink-400 object-cover" />
+              <Image src={v.previewImg} alt="Video preview" width={48} height={48} className="w-12 h-12 rounded-xl border-2 border-pink-400 object-cover" unoptimized />
             ) : (
               <div className="w-12 h-12 rounded-xl bg-pink-100 border-2 border-pink-400 flex items-center justify-center">
                 <FaCrown className="text-pink-400 text-2xl" />
@@ -70,7 +77,13 @@ export const Leaderboard = () => {
 };
 
 // --- Viral Referral System Popup ---
-export const ReferralPopup = ({ open, onClose, user }) => {
+type ReferralPopupProps = {
+  open: boolean;
+  onClose: () => void;
+  user: { uid?: string } | null;
+};
+
+export const ReferralPopup = ({ open, onClose, user }: ReferralPopupProps) => {
   const [copied, setCopied] = useState(false);
   if (!open) return null;
 

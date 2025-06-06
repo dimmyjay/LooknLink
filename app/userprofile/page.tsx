@@ -1,6 +1,7 @@
+"use client";
 import { getDatabase, ref, get } from "firebase/database";
 import { useEffect, useState } from "react";
-import { app as firebaseApp } from "@/firebase"; // adjust if needed
+import { app as firebaseApp } from "../../firebase"; // adjust if needed
 
 export function useUserProfile(uid: string | null) {
   const [profile, setProfile] = useState<{ photoURL: string; displayName: string } | null>(null);

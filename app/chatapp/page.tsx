@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { getDatabase, ref, onValue, push, off, get, update } from "firebase/database";
-import { app as firebaseApp, auth } from "../../../firebase";
+import { app as firebaseApp, auth } from "../../firebase";
 import { useParams } from "next/navigation";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 
